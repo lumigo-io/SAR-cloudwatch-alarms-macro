@@ -1,0 +1,67 @@
+{
+  "lambdaFunctions": [
+    {
+      "logicalId": "HelloLambdaFunction",
+      "errorRate": {
+        "threshold": 0.05,
+        "evaluationPeriods": 5,
+        "enabled": true
+      },
+      "throttleCount": {
+        "enabled": false
+      }
+    },
+    {
+      "functionName": "hello-function",
+      "errorRate": {
+        "enabled": false
+      }
+    }
+  ],
+  "sqsQueues": [
+    {
+      "logicalId": "MyQueue",
+      "messageAge": {
+        "threshold": 300000,
+        "evaluationPeriods": 1,
+        "enabled": true
+      }
+    },
+    {
+      "queueName": "my-other-queue",
+      "messageAge": {
+        "enabled": false
+      }
+    }
+  ],
+  "apiGatewayPaths": [
+    {
+      "path": "/",
+      "p90": {
+        "enabled": false
+      },
+      "p95": {
+        "enabled": false
+      }
+    }
+  ],
+  "stepFunctions": [
+    {
+      "logicalId": "MyStateMachine",
+      "failedCount": {
+        "threshold": 3,
+        "evaluationPeriods": 1,
+        "enabled": true
+      }
+    },
+    {
+      "stateMachineName": "my-state-machine",
+      "failedCount": {
+        "enabled": false
+      },
+      "throttleCount": {
+        "enabled": false
+      }
+    }
+  ]
+}

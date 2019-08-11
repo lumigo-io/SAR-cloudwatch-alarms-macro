@@ -1,0 +1,52 @@
+{
+  "name": "auto-generate-cw-alarms",
+  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "transform.js",
+  "scripts": {
+    "test": "jest",
+    "test:lint": "eslint .",
+    "prettier:ci": "prettier --print-width 120 --list-different \"src/**/*.js\"",
+    "prettier:fix": "prettier --print-width 120 --write \"./src/**/*.js\""
+  },
+  "author": "Lumigo LTD (https://lumigo.io)",
+  "license": "Apache 2",
+  "dependencies": {
+    "@dazn/lambda-powertools-logger": "^1.8.2",
+    "@hapi/joi": "^15.1.0",
+    "aws-sdk": "^2.501.0",
+    "lodash": "^4.17.15",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^8.0.0",
+    "@commitlint/config-conventional": "^8.0.0",
+    "coveralls": "^3.0.2",
+    "eslint": "^5.13.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-config-standard": "^12.0.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-node": "^9.1.0",
+    "eslint-plugin-promise": "^4.0.1",
+    "eslint-plugin-standard": "^4.0.0",
+    "husky": "^3.0.0",
+    "jest": "^24.8.0",
+    "lint-staged": "^9.1.0",
+    "prettier": "^1.18.2",
+    "serverless": "^1.49.0",
+    "serverless-cloudformation-sub-variables": "^0.2.1",
+    "serverless-cloudside-plugin": "^1.0.3"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint"
+    ]
+  }
+}

@@ -1,0 +1,1446 @@
+{
+  "region": "us-east-1",
+  "accountId": "968223882765",
+  "fragment": {
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Outputs": {
+      "Api": {
+        "Description": "API endpoint",
+        "Value": {
+          "Fn::Sub": "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+        }
+      }
+    },
+    "Resources": {
+      "MeFunctionRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+            "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+          ],
+          "Policies": [
+            {
+              "PolicyName": "MeFunctionRolePolicy0",
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": [
+                      "dynamodb:GetItem",
+                      "dynamodb:DeleteItem",
+                      "dynamodb:PutItem",
+                      "dynamodb:Scan",
+                      "dynamodb:Query",
+                      "dynamodb:UpdateItem",
+                      "dynamodb:BatchWriteItem",
+                      "dynamodb:BatchGetItem",
+                      "dynamodb:DescribeTable"
+                    ],
+                    "Resource": [
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                          {
+                            "tableName": {
+                              "Ref": "UserTable"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*",
+                          {
+                            "tableName": {
+                              "Ref": "UserTable"
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "Effect": "Allow"
+                  }
+                ]
+              }
+            },
+            {
+              "PolicyName": "MeFunctionRolePolicy1",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Action": ["secretsmanager:GetSecretValue"],
+                    "Resource": [
+                      {
+                        "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/Solve/Services/UserAPI/*"
+                      }
+                    ],
+                    "Effect": "Allow"
+                  }
+                ]
+              }
+            },
+            {
+              "PolicyName": "MeFunctionRolePolicy2",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": [
+                    "ssm:GetParameters",
+                    "ssm:GetParameter",
+                    "ssm:GetParametersByPath"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/Solve/*"
+                  },
+                  "Effect": "Allow"
+                }
+              }
+            }
+          ],
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Action": ["sts:AssumeRole"],
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": ["lambda.amazonaws.com"]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "RequestAccessTokenFunctionRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+            "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+          ],
+          "Policies": [
+            {
+              "PolicyName": "RequestAccessTokenFunctionRolePolicy0",
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": [
+                      "dynamodb:GetItem",
+                      "dynamodb:DeleteItem",
+                      "dynamodb:PutItem",
+                      "dynamodb:Scan",
+                      "dynamodb:Query",
+                      "dynamodb:UpdateItem",
+                      "dynamodb:BatchWriteItem",
+                      "dynamodb:BatchGetItem",
+                      "dynamodb:DescribeTable"
+                    ],
+                    "Resource": [
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                          {
+                            "tableName": {
+                              "Ref": "UserTable"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*",
+                          {
+                            "tableName": {
+                              "Ref": "UserTable"
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "Effect": "Allow"
+                  }
+                ]
+              }
+            },
+            {
+              "PolicyName": "RequestAccessTokenFunctionRolePolicy1",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": ["secretsmanager:GetSecretValue"],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/Solve/Services/UserAPI/*"
+                  },
+                  "Effect": "Allow"
+                }
+              }
+            },
+            {
+              "PolicyName": "RequestAccessTokenFunctionRolePolicy2",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": [
+                    "ssm:GetParameters",
+                    "ssm:GetParameter",
+                    "ssm:GetParametersByPath"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/Solve/*"
+                  },
+                  "Effect": "Allow"
+                }
+              }
+            }
+          ],
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Action": ["sts:AssumeRole"],
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": ["lambda.amazonaws.com"]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "UserAccessTokenAuthFunctionRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          ],
+          "Policies": [
+            {
+              "PolicyName": "UserAccessTokenAuthFunctionRolePolicy0",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": ["secretsmanager:GetSecretValue"],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/Solve/Services/UserAPI/*"
+                    }
+                  ],
+                  "Effect": "Allow"
+                }
+              }
+            },
+            {
+              "PolicyName": "UserAccessTokenAuthFunctionRolePolicy1",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": [
+                    "ssm:GetParameters",
+                    "ssm:GetParameter",
+                    "ssm:GetParametersByPath"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/Solve/*"
+                  },
+                  "Effect": "Allow"
+                }
+              }
+            }
+          ],
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Action": ["sts:AssumeRole"],
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": ["lambda.amazonaws.com"]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "MeFunction": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Layers": [
+            {
+              "Ref": "CustomSDKsLayerVersionArn"
+            }
+          ],
+          "TracingConfig": {
+            "Mode": "Active"
+          },
+          "Code": {
+            "S3Bucket": "devops-us-east-1-968223882765.solvehq.com",
+            "S3Key": "builds/63434dca49bce57b4fb5605a4d7d97d9"
+          },
+          "Tags": [
+            {
+              "Value": "SAM",
+              "Key": "lambda:createdBy"
+            }
+          ],
+          "MemorySize": 1536,
+          "Environment": {
+            "Variables": {
+              "STAGE": {
+                "Ref": "Stage"
+              }
+            }
+          },
+          "Handler": "index.handler",
+          "Role": {
+            "Fn::GetAtt": ["MeFunctionRole", "Arn"]
+          },
+          "Timeout": 30,
+          "Runtime": "nodejs8.10"
+        }
+      },
+      "CompleteStoryFunctionRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+            "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+          ],
+          "Policies": [
+            {
+              "PolicyName": "CompleteStoryFunctionRolePolicy0",
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": [
+                      "dynamodb:GetItem",
+                      "dynamodb:DeleteItem",
+                      "dynamodb:PutItem",
+                      "dynamodb:Scan",
+                      "dynamodb:Query",
+                      "dynamodb:UpdateItem",
+                      "dynamodb:BatchWriteItem",
+                      "dynamodb:BatchGetItem",
+                      "dynamodb:DescribeTable"
+                    ],
+                    "Resource": [
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                          {
+                            "tableName": {
+                              "Ref": "UserTable"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*",
+                          {
+                            "tableName": {
+                              "Ref": "UserTable"
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "Effect": "Allow"
+                  }
+                ]
+              }
+            },
+            {
+              "PolicyName": "CompleteStoryFunctionRolePolicy1",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Action": ["secretsmanager:GetSecretValue"],
+                    "Resource": [
+                      {
+                        "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/Solve/Services/UserAPI/*"
+                      }
+                    ],
+                    "Effect": "Allow"
+                  }
+                ]
+              }
+            },
+            {
+              "PolicyName": "CompleteStoryFunctionRolePolicy2",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": [
+                    "ssm:GetParameters",
+                    "ssm:GetParameter",
+                    "ssm:GetParametersByPath"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/Solve/*"
+                  },
+                  "Effect": "Allow"
+                }
+              }
+            }
+          ],
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Action": ["sts:AssumeRole"],
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": ["lambda.amazonaws.com"]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "SpendKeysOnStoryFunctionRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+            "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+          ],
+          "Policies": [
+            {
+              "PolicyName": "SpendKeysOnStoryFunctionRolePolicy0",
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": [
+                      "dynamodb:GetItem",
+                      "dynamodb:DeleteItem",
+                      "dynamodb:PutItem",
+                      "dynamodb:Scan",
+                      "dynamodb:Query",
+                      "dynamodb:UpdateItem",
+                      "dynamodb:BatchWriteItem",
+                      "dynamodb:BatchGetItem",
+                      "dynamodb:DescribeTable"
+                    ],
+                    "Resource": [
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                          {
+                            "tableName": {
+                              "Ref": "UserTable"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*",
+                          {
+                            "tableName": {
+                              "Ref": "UserTable"
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "Effect": "Allow"
+                  }
+                ]
+              }
+            },
+            {
+              "PolicyName": "SpendKeysOnStoryFunctionRolePolicy1",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Action": ["secretsmanager:GetSecretValue"],
+                    "Resource": [
+                      {
+                        "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/Solve/Services/UserAPI/*"
+                      }
+                    ],
+                    "Effect": "Allow"
+                  }
+                ]
+              }
+            },
+            {
+              "PolicyName": "SpendKeysOnStoryFunctionRolePolicy2",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": [
+                    "ssm:GetParameters",
+                    "ssm:GetParameter",
+                    "ssm:GetParametersByPath"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/Solve/*"
+                  },
+                  "Effect": "Allow"
+                }
+              }
+            }
+          ],
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Action": ["sts:AssumeRole"],
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": ["lambda.amazonaws.com"]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "JWTSecret": {
+        "DeletionPolicy": "Retain",
+        "Type": "AWS::SecretsManager::Secret",
+        "Properties": {
+          "GenerateSecretString": {
+            "GenerateStringKey": "secret",
+            "SecretStringTemplate": "{}",
+            "PasswordLength": 32
+          },
+          "Description": "The secret passed to jwt.verify and jwt.sign",
+          "Name": "/Solve/Services/UserAPI/test/JWTSecret"
+        }
+      },
+      "VoteFunctionRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+            "arn:aws:iam::aws:policy/AWSXrayWriteOnlyAccess"
+          ],
+          "Policies": [
+            {
+              "PolicyName": "VoteFunctionRolePolicy0",
+              "PolicyDocument": {
+                "Statement": [
+                  {
+                    "Action": [
+                      "dynamodb:GetItem",
+                      "dynamodb:DeleteItem",
+                      "dynamodb:PutItem",
+                      "dynamodb:Scan",
+                      "dynamodb:Query",
+                      "dynamodb:UpdateItem",
+                      "dynamodb:BatchWriteItem",
+                      "dynamodb:BatchGetItem",
+                      "dynamodb:DescribeTable"
+                    ],
+                    "Resource": [
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}",
+                          {
+                            "tableName": {
+                              "Ref": "UserTable"
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "Fn::Sub": [
+                          "arn:${AWS::Partition}:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tableName}/index/*",
+                          {
+                            "tableName": {
+                              "Ref": "UserTable"
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "Effect": "Allow"
+                  }
+                ]
+              }
+            },
+            {
+              "PolicyName": "VoteFunctionRolePolicy1",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Action": ["secretsmanager:GetSecretValue"],
+                    "Resource": [
+                      {
+                        "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/Solve/Services/UserAPI/*"
+                      }
+                    ],
+                    "Effect": "Allow"
+                  }
+                ]
+              }
+            },
+            {
+              "PolicyName": "VoteFunctionRolePolicy2",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": [
+                    "ssm:GetParameters",
+                    "ssm:GetParameter",
+                    "ssm:GetParametersByPath"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/Solve/*"
+                  },
+                  "Effect": "Allow"
+                }
+              }
+            },
+            {
+              "PolicyName": "VoteFunctionRolePolicy3",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": ["execute-api:Invoke"],
+                  "Resource": {
+                    "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:*/*/*/*"
+                  },
+                  "Effect": "Allow"
+                }
+              }
+            },
+            {
+              "PolicyName": "VoteFunctionRolePolicy4",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": ["servicediscovery:DiscoverInstances"],
+                  "Resource": "*",
+                  "Effect": "Allow"
+                }
+              }
+            }
+          ],
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Action": ["sts:AssumeRole"],
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": ["lambda.amazonaws.com"]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "RequestAccessTokenFunctionRequestAccessTokenPermissionStage": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Ref": "RequestAccessTokenFunction"
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/token",
+              {
+                "__Stage__": {
+                  "Ref": "Stage"
+                },
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "MyApi": {
+        "Type": "AWS::ApiGateway::RestApi",
+        "Properties": {
+          "Body": {
+            "info": {
+              "version": "1.0",
+              "title": {
+                "Ref": "AWS::StackName"
+              }
+            },
+            "paths": {
+              "/token": {
+                "post": {
+                  "x-amazon-apigateway-integration": {
+                    "httpMethod": "POST",
+                    "type": "aws_proxy",
+                    "uri": {
+                      "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${RequestAccessTokenFunction.Arn}/invocations"
+                    }
+                  },
+                  "security": [
+                    {
+                      "NONE": []
+                    }
+                  ],
+                  "responses": {}
+                }
+              },
+              "/vote": {
+                "post": {
+                  "x-amazon-apigateway-integration": {
+                    "httpMethod": "POST",
+                    "type": "aws_proxy",
+                    "uri": {
+                      "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${VoteFunction.Arn}/invocations"
+                    }
+                  },
+                  "security": [
+                    {
+                      "UserAccessTokenAuth": []
+                    }
+                  ],
+                  "responses": {}
+                }
+              },
+              "/stories/{storyId}/spendKeys": {
+                "post": {
+                  "x-amazon-apigateway-integration": {
+                    "httpMethod": "POST",
+                    "type": "aws_proxy",
+                    "uri": {
+                      "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${SpendKeysOnStoryFunction.Arn}/invocations"
+                    }
+                  },
+                  "security": [
+                    {
+                      "UserAccessTokenAuth": []
+                    }
+                  ],
+                  "responses": {}
+                }
+              },
+              "/stories/{storyId}/complete": {
+                "post": {
+                  "x-amazon-apigateway-integration": {
+                    "httpMethod": "POST",
+                    "type": "aws_proxy",
+                    "uri": {
+                      "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CompleteStoryFunction.Arn}/invocations"
+                    }
+                  },
+                  "security": [
+                    {
+                      "UserAccessTokenAuth": []
+                    }
+                  ],
+                  "responses": {}
+                }
+              },
+              "/me": {
+                "get": {
+                  "x-amazon-apigateway-integration": {
+                    "httpMethod": "POST",
+                    "type": "aws_proxy",
+                    "uri": {
+                      "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${MeFunction.Arn}/invocations"
+                    }
+                  },
+                  "security": [
+                    {
+                      "UserAccessTokenAuth": []
+                    }
+                  ],
+                  "responses": {}
+                }
+              }
+            },
+            "swagger": "2.0",
+            "securityDefinitions": {
+              "InternalAuth": {
+                "in": "header",
+                "type": "apiKey",
+                "name": "Authorization",
+                "x-amazon-apigateway-authorizer": {
+                  "type": "token",
+                  "authorizerResultTtlInSeconds": 60,
+                  "authorizerUri": {
+                    "Fn::Sub": [
+                      "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                      {
+                        "__FunctionArn__": {
+                          "Fn::GetAtt": ["InternalAuthFunction", "Arn"]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "x-amazon-apigateway-authtype": "custom"
+              },
+              "UserAccessTokenAuth": {
+                "in": "header",
+                "type": "apiKey",
+                "name": "Authorization",
+                "x-amazon-apigateway-authorizer": {
+                  "type": "token",
+                  "authorizerResultTtlInSeconds": 60,
+                  "authorizerUri": {
+                    "Fn::Sub": [
+                      "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${__FunctionArn__}/invocations",
+                      {
+                        "__FunctionArn__": {
+                          "Fn::GetAtt": ["UserAccessTokenAuthFunction", "Arn"]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "x-amazon-apigateway-authtype": "custom"
+              }
+            }
+          }
+        }
+      },
+      "VoteFunctionMePermissionStage": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Ref": "VoteFunction"
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/vote",
+              {
+                "__Stage__": {
+                  "Ref": "Stage"
+                },
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "RequestAccessTokenFunctionRequestAccessTokenPermissionTest": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Ref": "RequestAccessTokenFunction"
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/token",
+              {
+                "__Stage__": "*",
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "UserAPIServiceConfig": {
+        "Type": "AWS::SSM::Parameter",
+        "Properties": {
+          "Type": "String",
+          "Name": "/Solve/Services/UserAPI/test/Config",
+          "Value": {
+            "Fn::Sub": "{\n  \"dynamodb\": {\n    \"params\": {\n      \"TableName\": \"${UserTable}\"\n    }\n  },\n  \"logLevel\": \"${LogLevel}\"\n}\n"
+          }
+        }
+      },
+      "InternalJWTSecret": {
+        "Type": "AWS::SecretsManager::Secret",
+        "Properties": {
+          "GenerateSecretString": {
+            "GenerateStringKey": "secret",
+            "SecretStringTemplate": "{}",
+            "PasswordLength": 32
+          },
+          "Description": "The secret passed to jwt.verify and jwt.sign for internal auth functions",
+          "Name": "/Solve/Services/UserAPI/test/InternalJWTSecret"
+        }
+      },
+      "MyApiDeploymentf9aa810115": {
+        "Type": "AWS::ApiGateway::Deployment",
+        "Properties": {
+          "RestApiId": {
+            "Ref": "MyApi"
+          },
+          "Description": "RestApi deployment id: f9aa81011551ac1c4adee1744a672f5bcf70593b",
+          "StageName": "Stage"
+        }
+      },
+      "SpendKeysOnStoryFunction": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Layers": [
+            {
+              "Ref": "CustomSDKsLayerVersionArn"
+            }
+          ],
+          "TracingConfig": {
+            "Mode": "Active"
+          },
+          "Code": {
+            "S3Bucket": "devops-us-east-1-968223882765.solvehq.com",
+            "S3Key": "builds/f40944d80356ff23592ab25d78210ab4"
+          },
+          "Tags": [
+            {
+              "Value": "SAM",
+              "Key": "lambda:createdBy"
+            }
+          ],
+          "MemorySize": 1536,
+          "Environment": {
+            "Variables": {
+              "STAGE": {
+                "Ref": "Stage"
+              }
+            }
+          },
+          "Handler": "index.handler",
+          "Role": {
+            "Fn::GetAtt": ["SpendKeysOnStoryFunctionRole", "Arn"]
+          },
+          "Timeout": 30,
+          "Runtime": "nodejs8.10"
+        }
+      },
+      "VoteFunctionMePermissionTest": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Ref": "VoteFunction"
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/vote",
+              {
+                "__Stage__": "*",
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "SpendKeysOnStoryFunctionMePermissionStage": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Ref": "SpendKeysOnStoryFunction"
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/stories/{storyId}/spendKeys",
+              {
+                "__Stage__": {
+                  "Ref": "Stage"
+                },
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "InternalAuthFunction": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Layers": [
+            {
+              "Ref": "CustomSDKsLayerVersionArn"
+            }
+          ],
+          "Code": {
+            "S3Bucket": "devops-us-east-1-968223882765.solvehq.com",
+            "S3Key": "builds/d447ff9d076a6432490b5f375cbf9582"
+          },
+          "Tags": [
+            {
+              "Value": "SAM",
+              "Key": "lambda:createdBy"
+            }
+          ],
+          "MemorySize": 1536,
+          "Environment": {
+            "Variables": {
+              "STAGE": {
+                "Ref": "Stage"
+              }
+            }
+          },
+          "Handler": "index.internalTokenAuthorizer",
+          "Role": {
+            "Fn::GetAtt": ["InternalAuthFunctionRole", "Arn"]
+          },
+          "Timeout": 30,
+          "Runtime": "nodejs8.10"
+        }
+      },
+      "MyApiStage": {
+        "Type": "AWS::ApiGateway::Stage",
+        "Properties": {
+          "DeploymentId": {
+            "Ref": "MyApiDeploymentf9aa810115"
+          },
+          "RestApiId": {
+            "Ref": "MyApi"
+          },
+          "MethodSettings": [
+            {
+              "ThrottlingRateLimit": 5000,
+              "ResourcePath": "/*",
+              "DataTraceEnabled": true,
+              "HttpMethod": "*",
+              "CacheDataEncrypted": false,
+              "LoggingLevel": "INFO",
+              "MetricsEnabled": true,
+              "CachingEnabled": false,
+              "ThrottlingBurstLimit": 10000
+            }
+          ],
+          "StageName": {
+            "Ref": "Stage"
+          }
+        }
+      },
+      "CompleteStoryFunctionMePermissionTest": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Ref": "CompleteStoryFunction"
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/stories/{storyId}/complete",
+              {
+                "__Stage__": "*",
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "VoteFunction": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Layers": [
+            {
+              "Ref": "CustomSDKsLayerVersionArn"
+            }
+          ],
+          "TracingConfig": {
+            "Mode": "Active"
+          },
+          "Code": {
+            "S3Bucket": "devops-us-east-1-968223882765.solvehq.com",
+            "S3Key": "builds/e96ab0ce5096f0cb600316b24ade1b99"
+          },
+          "Tags": [
+            {
+              "Value": "SAM",
+              "Key": "lambda:createdBy"
+            }
+          ],
+          "MemorySize": 1536,
+          "Environment": {
+            "Variables": {
+              "STAGE": {
+                "Ref": "Stage"
+              }
+            }
+          },
+          "Handler": "index.handler",
+          "Role": {
+            "Fn::GetAtt": ["VoteFunctionRole", "Arn"]
+          },
+          "Timeout": 30,
+          "Runtime": "nodejs8.10"
+        }
+      },
+      "CompleteStoryFunctionMePermissionStage": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Ref": "CompleteStoryFunction"
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/stories/{storyId}/complete",
+              {
+                "__Stage__": {
+                  "Ref": "Stage"
+                },
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "MeFunctionMePermissionStage": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Ref": "MeFunction"
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/me",
+              {
+                "__Stage__": {
+                  "Ref": "Stage"
+                },
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "MeFunctionMePermissionTest": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Ref": "MeFunction"
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/GET/me",
+              {
+                "__Stage__": "*",
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "InternalAuthFunctionRole": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {
+          "ManagedPolicyArns": [
+            "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+          ],
+          "Policies": [
+            {
+              "PolicyName": "InternalAuthFunctionRolePolicy0",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": ["secretsmanager:GetSecretValue"],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:/Solve/Services/UserAPI/*"
+                    }
+                  ],
+                  "Effect": "Allow"
+                }
+              }
+            },
+            {
+              "PolicyName": "InternalAuthFunctionRolePolicy1",
+              "PolicyDocument": {
+                "Statement": {
+                  "Action": [
+                    "ssm:GetParameters",
+                    "ssm:GetParameter",
+                    "ssm:GetParametersByPath"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter/Solve/*"
+                  },
+                  "Effect": "Allow"
+                }
+              }
+            }
+          ],
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Action": ["sts:AssumeRole"],
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": ["lambda.amazonaws.com"]
+                }
+              }
+            ]
+          }
+        }
+      },
+      "UserTable": {
+        "Type": "AWS::DynamoDB::Table",
+        "Properties": {
+          "KeySchema": [
+            {
+              "KeyType": "HASH",
+              "AttributeName": "userId"
+            },
+            {
+              "KeyType": "RANGE",
+              "AttributeName": "recordType"
+            }
+          ],
+          "StreamSpecification": {
+            "StreamViewType": "NEW_AND_OLD_IMAGES"
+          },
+          "AttributeDefinitions": [
+            {
+              "AttributeName": "userId",
+              "AttributeType": "S"
+            },
+            {
+              "AttributeName": "recordType",
+              "AttributeType": "S"
+            }
+          ],
+          "BillingMode": "PAY_PER_REQUEST"
+        }
+      },
+      "UserAPIServiceInstance": {
+        "Type": "AWS::ServiceDiscovery::Instance",
+        "Properties": {
+          "InstanceAttributes": {
+            "ApiEndpoint": {
+              "Fn::Sub": "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+            }
+          },
+          "ServiceId": {
+            "Ref": "UserServiceId"
+          }
+        }
+      },
+      "SpendKeysOnStoryFunctionMePermissionTest": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Ref": "SpendKeysOnStoryFunction"
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/${__Stage__}/POST/stories/{storyId}/spendKeys",
+              {
+                "__Stage__": "*",
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "CompleteStoryFunction": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Layers": [
+            {
+              "Ref": "CustomSDKsLayerVersionArn"
+            }
+          ],
+          "TracingConfig": {
+            "Mode": "Active"
+          },
+          "Code": {
+            "S3Bucket": "devops-us-east-1-968223882765.solvehq.com",
+            "S3Key": "builds/792694e8d68100b35f64bfd3da74ccdd"
+          },
+          "Tags": [
+            {
+              "Value": "SAM",
+              "Key": "lambda:createdBy"
+            }
+          ],
+          "MemorySize": 1536,
+          "Environment": {
+            "Variables": {
+              "STAGE": {
+                "Ref": "Stage"
+              }
+            }
+          },
+          "Handler": "index.handler",
+          "Role": {
+            "Fn::GetAtt": ["CompleteStoryFunctionRole", "Arn"]
+          },
+          "Timeout": 30,
+          "Runtime": "nodejs8.10"
+        }
+      },
+      "MyApiUserAccessTokenAuthAuthorizerPermission": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Fn::GetAtt": ["UserAccessTokenAuthFunction", "Arn"]
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
+              {
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "ServiceEndpointParameter": {
+        "Type": "AWS::SSM::Parameter",
+        "Properties": {
+          "Type": "String",
+          "Name": "/Solve/Outputs/UserAPI/test/ServiceEndpoint",
+          "Value": {
+            "Fn::Sub": "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+          }
+        }
+      },
+      "MyApiInternalAuthAuthorizerPermission": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {
+          "Action": "lambda:invokeFunction",
+          "Principal": "apigateway.amazonaws.com",
+          "FunctionName": {
+            "Fn::GetAtt": ["InternalAuthFunction", "Arn"]
+          },
+          "SourceArn": {
+            "Fn::Sub": [
+              "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${__ApiId__}/authorizers/*",
+              {
+                "__ApiId__": {
+                  "Ref": "MyApi"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "RequestAccessTokenFunction": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Layers": [
+            {
+              "Ref": "CustomSDKsLayerVersionArn"
+            }
+          ],
+          "TracingConfig": {
+            "Mode": "Active"
+          },
+          "Code": {
+            "S3Bucket": "devops-us-east-1-968223882765.solvehq.com",
+            "S3Key": "builds/cf913fd706469fe90f71b9e7110560ce"
+          },
+          "Tags": [
+            {
+              "Value": "SAM",
+              "Key": "lambda:createdBy"
+            }
+          ],
+          "MemorySize": 1536,
+          "Environment": {
+            "Variables": {
+              "STAGE": {
+                "Ref": "Stage"
+              }
+            }
+          },
+          "Handler": "index.handler",
+          "Role": {
+            "Fn::GetAtt": ["RequestAccessTokenFunctionRole", "Arn"]
+          },
+          "Timeout": 30,
+          "Runtime": "nodejs8.10"
+        }
+      },
+      "UserAccessTokenAuthFunction": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Layers": [
+            {
+              "Ref": "CustomSDKsLayerVersionArn"
+            }
+          ],
+          "Code": {
+            "S3Bucket": "devops-us-east-1-968223882765.solvehq.com",
+            "S3Key": "builds/d447ff9d076a6432490b5f375cbf9582"
+          },
+          "Tags": [
+            {
+              "Value": "SAM",
+              "Key": "lambda:createdBy"
+            }
+          ],
+          "MemorySize": 1536,
+          "Environment": {
+            "Variables": {
+              "STAGE": {
+                "Ref": "Stage"
+              }
+            }
+          },
+          "Handler": "index.userTokenAuthorizer",
+          "Role": {
+            "Fn::GetAtt": ["UserAccessTokenAuthFunctionRole", "Arn"]
+          },
+          "Timeout": 30,
+          "Runtime": "nodejs8.10"
+        }
+      }
+    },
+    "Description": "UserAPI\nNode.js Serverless API Driven using SAM, API Gateway, and Lambda\n",
+    "Parameters": {
+      "LogLevel": {
+        "Default": "WARN",
+        "Type": "String",
+        "Description": "Varies the service log level for logging in lambda functions",
+        "AllowedValues": ["DEBUG", "INFO", "WARN", "ERROR"]
+      },
+      "CustomSDKsLayerVersionArn": {
+        "Default": "/Solve/Layers/NodeJS/CustomSDKs/ARN",
+        "Type": "AWS::SSM::Parameter::Value<String>",
+        "Description": "The Layer Version ARN of the Custom SDKs Layer which packages aws-sdk and aws-xray-sdk"
+      },
+      "UserServiceId": {
+        "Default": "/Solve/Outputs/ServiceDiscovery/UserAPIServiceId",
+        "Type": "AWS::SSM::Parameter::Value<String>",
+        "Description": "The parameter that contains the Service Discovery namespace id"
+      },
+      "Stage": {
+        "Default": "dev",
+        "Type": "String",
+        "Description": "Name of the stage - e.g. dev, test, staging, production"
+      }
+    }
+  },
+  "transformId": "968223882765::AddApiAlarms",
+  "params": {},
+  "requestId": "c6f0b54d-8352-4e0e-bd56-66f7959d4bba",
+  "templateParameterValues": {
+    "Stage": "test",
+    "UserServiceId": "srv-c3tqwqdlqnsuo2mb",
+    "CustomSDKsLayerVersionArn": "arn:aws:lambda:us-east-1:968223882765:layer:CustomSdksLayer:1",
+    "LogLevel": "WARN"
+  }
+}

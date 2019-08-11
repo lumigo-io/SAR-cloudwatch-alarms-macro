@@ -1,0 +1,80 @@
+{
+  "lambda": {
+    "errorRate": {
+      "threshold": 0.01,
+      "evaluationPeriods": 5,
+      "enabled": true
+    },
+    "throttleCount": {
+      "threshold": 1,
+      "evaluationPeriods": 1,
+      "enabled": true
+    },
+    "dlqErrorCount": {
+      "threshold": 1,
+      "evaluationPeriods": 1,
+      "enabled": true
+    },
+    "iteratorAge": {
+      "threshold": 60000,
+      "evaluationPeriods": 5,
+      "enabled": true
+    }
+  },
+  "sqs": {
+    "messageAge": {
+      "threshold": 600000,
+      "evaluationPeriods": 1,
+      "enabled": true
+    }
+  },
+  "apiGateway": {
+    "p90": {
+      "threshold": 1000,
+      "evaluationPeriods": 5,
+      "enabled": true
+    },
+    "p95": {
+      "threshold": 3000,
+      "evaluationPeriods": 5,
+      "enabled": true
+    },
+    "p99": {
+      "threshold": 5000,
+      "evaluationPeriods": 5,
+      "enabled": true
+    },
+    "status4xxRate": {
+      "threshold": 0.05,
+      "evaluationPeriods": 5,
+      "enabled": true
+    },
+    "status5xxRate": {
+      "threshold": 0.01,
+      "evaluationPeriods": 5,
+      "enabled": true
+    },
+    "status2xxRate": {
+      "threshold": 0.99,
+      "evaluationPeriods": 5,
+      "enabled": true
+    }
+  },
+  "stepFunctions": {
+    "failedCount": {
+      "threshold": 1,
+      "evaluationPeriods": 1,
+      "enabled": true
+    },
+    "throttleCount": {
+      "threshold": 1,
+      "evaluationPeriods": 1,
+      "enabled": true
+    },
+    "timedOutCount": {
+      "threshold": 1,
+      "evaluationPeriods": 1,
+      "enabled": true
+    }
+  }
+}

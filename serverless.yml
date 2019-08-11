@@ -1,0 +1,42 @@
+service: cfn-cw-alarms-macro
+
+plugins:
+  - serverless-cloudside-plugin
+  - serverless-cloudformation-sub-variables
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  iamRoleStatements:
+    - Effect: Allow
+      Action: ssm:GetParameter
+      Resource: "*"
+    - Effect: Allow
+      Action: s3:PutObject
+      Resource:
+        Fn::Sub:
+          - arn:aws:s3:::#{BucketName}/*
+          - BucketName:
+              Ref: CloudFormationStackBucket
+
+functions:
+  Transform:
+    handler: src/index.handler
+    environment:
+      BUCKET:
+        Ref: CloudFormationStackBucket
+      DEFAULT_CONFIG_PARAM_NAME: /alarms/defaultConfig
+
+# you can add CloudFormation resource templates here
+resources:
+  Resources:
+    CloudFormationStackBucket:
+      Type: AWS::S3::Bucket
+      Properties: {}
+
+    Macro:
+      Type: AWS::CloudFormation::Macro
+      Properties:
+        Name: AddCloudWatchAlarms
+        FunctionName: 
+          Fn::GetAtt: [TransformLambdaFunction, Arn]
