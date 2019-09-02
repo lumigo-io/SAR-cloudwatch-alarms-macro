@@ -11,7 +11,7 @@ Metadata:
     ReadmeUrl: README.md
     Labels: ['lambda', 'cloudwatch', 'alarms', 'monitoring']
     HomePageUrl: https://github.com/lumigo/SAR-cloudwatch-alarms-macro
-    SemanticVersion: 1.0.0
+    SemanticVersion: 1.0.1
     SourceCodeUrl: https://github.com/lumigo/SAR-cloudwatch-alarms-macro
 
 Parameters:
@@ -52,7 +52,7 @@ Resources:
             Action: s3:PutObject
             Resource:
               Fn::Sub:
-                - arn:aws:s3:::#{BucketName}/*
+                - arn:aws:s3:::${BucketName}/*
                 - BucketName:
                     Ref: CloudFormationStackBucket
 
