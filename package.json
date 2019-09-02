@@ -1,5 +1,5 @@
 {
-  "name": "auto-generate-cw-alarms",
+  "name": "sar-cloudwatch-alarms-macro",
   "private": true,
   "version": "1.0.0",
   "description": "",
@@ -8,7 +8,9 @@
     "test": "jest",
     "test:lint": "eslint .",
     "prettier:ci": "prettier --print-width 120 --list-different \"src/**/*.js\"",
-    "prettier:fix": "prettier --print-width 120 --write \"./src/**/*.js\""
+    "prettier:fix": "prettier --print-width 120 --write \"./src/**/*.js\"",
+    "package": "sam package --template-file template.yml --output-template-file packaged.yml --s3-bucket sar-cloudwatch-alarms-macro",
+    "publish": "sam publish --template packaged.yml --region us-east-1"
   },
   "author": "Lumigo LTD (https://lumigo.io)",
   "license": "Apache 2",
