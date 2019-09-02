@@ -1,0 +1,47 @@
+service: sar-cloudwatch-alarms-macro-demo
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: /
+          method: get
+
+# should generate alarm for the state machine
+stepFunctions:
+  stateMachines:
+    hellostepfunc1:
+      definition:
+        StartAt: HelloWorld1
+        States:
+          HelloWorld1:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [hello, Arn]
+            End: true
+
+# you can add CloudFormation resource templates here
+resources:
+  Transform:
+    # assuming this is the name you gave the macro when you deployed the SAR app
+    - AddCloudWatchAlarms
+  Parameters:
+    MacroParamStage:
+      Type: String
+      Default: ${self:provider.stage}
+    MacroParamTopicArn:
+      Type: String
+      Default: arn:aws:sns:us-east-1:374852340823:NotifyMe
+    MacroParamOverrideConfigParamName:
+      Type: String
+      Default: /alarms/overrideConfig
+  # should generate alarm for the queue
+  Resources:
+    MyQueue:
+      Type: AWS::SQS::Queue
+      Properties: {}      
