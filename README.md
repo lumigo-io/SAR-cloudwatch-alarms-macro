@@ -24,7 +24,18 @@ The full schema for both `default` and `override` configurations can be found [h
 
 ## Configurations
 
-### SNS topic
+### Stage (REQUIRED)
+
+To inform the macro the stage (e.g. dev, staging, production), you need to specify a `MacroParamStage` parameter in the stack you wish to deploy.
+
+```yml
+Parameters:
+  MacroParamStage:
+    Type: String
+    Default: <stage name>
+```
+
+### SNS topic (REQUIRED)
 
 To inform the macro what SNS topic to use for the alarm action, you need to specify a `MacroParamTopicArn` parameter in the stack you wish to deploy.
 
@@ -38,7 +49,7 @@ Parameters:
     Default: arn:sns:...
 ```
 
-### Default Configuration
+### Default Configuration (REQUIRED)
 
 The location of the `default` configuration is specified when you deploy the SAR app, via the `DefaultConfigParamName` parameter. This should point to a `String` paramter in SSM paramter store. 
 
