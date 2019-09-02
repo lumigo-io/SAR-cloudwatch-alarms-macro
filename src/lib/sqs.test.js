@@ -38,7 +38,7 @@ describe("#sqs", () => {
 		expect(nestedStack).toBeNull();
 		expect(mockPutObject).not.toBeCalled();
 	});
-  
+
 	describe("given there are 2 SQS queues", () => {
 		const fragment = {
 			Resources: {
@@ -56,27 +56,27 @@ describe("#sqs", () => {
 				}
 			}
 		};
-    
-		const checkNestedStackParameters = (parameters) => {
+
+		const checkNestedStackParameters = parameters => {
 			expect(Object.keys(parameters)).toHaveLength(3);
 			expect(parameters).toHaveProperty("HelloQueueName");
 			expect(parameters).toHaveProperty("WorldQueueName");
 			expect(parameters).toHaveProperty("TopicArn");
 		};
-    
-		const checkNestedStackParameterValues = (values) => {
+
+		const checkNestedStackParameterValues = values => {
 			expect(Object.keys(values)).toHaveLength(3);
 
 			expect(values).toHaveProperty("HelloQueueName");
 			expect(values.HelloQueueName).toEqual({
 				"Fn::GetAtt": ["HelloQueue", "QueueName"]
 			});
-      
+
 			expect(values).toHaveProperty("WorldQueueName");
 			expect(values.WorldQueueName).toEqual({
 				"Fn::GetAtt": ["WorldQueue", "QueueName"]
 			});
-      
+
 			expect(values).toHaveProperty("TopicArn");
 			expect(values.TopicArn).toEqual({
 				Ref: "MacroParamTopicArn"
@@ -88,19 +88,19 @@ describe("#sqs", () => {
 			expect(nestedStack).not.toBeNull();
 			expect(mockPutObject).toBeCalled();
 			expect(mockGetSignedUrl).toBeCalled();
-  
+
 			const [{ Body, Bucket }] = mockPutObject.mock.calls[0];
 			expect(Bucket).toBe(process.env.BUCKET);
 			const { Resources, Parameters } = JSON.parse(Body);
-      
+
 			checkNestedStackParameters(Parameters);
 			checkNestedStackParameterValues(nestedStack.Properties.Parameters);
-  
+
 			const logicalIds = Object.keys(Resources);
 			expect(logicalIds).toHaveLength(2);
 			const expectedLogicalIds = ["HelloQueueMessageAgeAlarm", "WorldQueueMessageAgeAlarm"];
 			expect(logicalIds).toEqual(expect.arrayContaining(expectedLogicalIds));
-  
+
 			Object.values(Resources).forEach(resource => {
 				expect(resource.Type).toBe("AWS::CloudWatch::Alarm");
 				expect(resource).toHaveProperty("Properties.AlarmName");
@@ -111,7 +111,7 @@ describe("#sqs", () => {
 				expect(resource).toHaveProperty("Properties.Statistic", "Maximum");
 			});
 		});
-    
+
 		test("when the override config disables an alarm, no alarm is generated", async () => {
 			const overrideConfig = {
 				sqsQueues: [
@@ -122,20 +122,20 @@ describe("#sqs", () => {
 					}
 				]
 			};
-  
+
 			const nestedStack = await sqs.createAlarms(fragment, defaultConfig, overrideConfig);
 			expect(nestedStack).not.toBeNull();
 			expect(mockPutObject).toBeCalled();
 			expect(mockGetSignedUrl).toBeCalled();
-  
+
 			const [{ Body, Bucket }] = mockPutObject.mock.calls[0];
 			expect(Bucket).toBe(process.env.BUCKET);
 			const { Resources } = JSON.parse(Body);
-      
+
 			const logicalIds = Object.keys(Resources);
 			expect(logicalIds).toHaveLength(1);
 			const expectedLogicalIds = ["WorldQueueMessageAgeAlarm"];
-			expect(logicalIds).toEqual(expect.arrayContaining(expectedLogicalIds));	
+			expect(logicalIds).toEqual(expect.arrayContaining(expectedLogicalIds));
 		});
 	});
 });

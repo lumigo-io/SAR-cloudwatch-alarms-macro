@@ -33,17 +33,17 @@ module.exports.handler = async event => {
 	if (sfnStack) {
 		newFragment.Resources["NestedStackStepFunctionsAlarms"] = sfnStack;
 	}
-  
+
 	const sqsStack = await sqs.createAlarms(newFragment, defaultConfig, overrideConfig);
 	if (sqsStack) {
 		newFragment.Resources["NestedStackSqsAlarms"] = sqsStack;
 	}
-  
+
 	const lambdaStack = await lambda.createAlarms(newFragment, defaultConfig, overrideConfig);
 	if (lambdaStack) {
 		newFragment.Resources["NestedStackLambdaAlarms"] = lambdaStack;
 	}
-  
+
 	const apigwStack = await apiGateway.createAlarms(newFragment, defaultConfig, overrideConfig);
 	if (apigwStack) {
 		newFragment.Resources["NestedStackApiGatewayAlarms"] = apigwStack;
@@ -61,8 +61,8 @@ module.exports.handler = async event => {
 function validate(parameters) {
 	if (!_.has(parameters, TopicArnParamName)) {
 		const errorMessage =
-      `You must declare a CloudFormation parameter [${TopicArnParamName}]. ` +
-      "It should be the ARN to an SNS topic, to be used by the generated CloudWatch alarms.";
+			`You must declare a CloudFormation parameter [${TopicArnParamName}]. ` +
+			"It should be the ARN to an SNS topic, to be used by the generated CloudWatch alarms.";
 
 		throw new Error(errorMessage);
 	}

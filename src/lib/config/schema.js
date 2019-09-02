@@ -95,7 +95,7 @@ const apiGateway = Joi.object().keys({
 	p99: apigwP99,
 	status4xxRate: apigwStatus4xxRate,
 	status5xxRate: apigwStatus5xxRate,
-	status2xxRate: apigwStatus2xxRate,    
+	status2xxRate: apigwStatus2xxRate
 });
 
 // STEP FUNCTIONS configurations

@@ -32,13 +32,13 @@ beforeEach(() => {
 
 describe("#stepfunctions", () => {
 	const sfn = new StepFunctions();
-  
+
 	test("given there are no state machines, it returns no alarms", async () => {
-		const nestedStack = await sfn.createAlarms({ Resources: {} }, defaultConfig);    
+		const nestedStack = await sfn.createAlarms({ Resources: {} }, defaultConfig);
 		expect(nestedStack).toBeNull();
 		expect(mockPutObject).not.toBeCalled();
 	});
-  
+
 	describe("given there are 2 state machines", () => {
 		const fragment = {
 			Resources: {
@@ -56,20 +56,20 @@ describe("#stepfunctions", () => {
 				}
 			}
 		};
-    
-		const checkNestedStackParameters = (parameters) => {
+
+		const checkNestedStackParameters = parameters => {
 			expect(Object.keys(parameters)).toHaveLength(5);
-      
+
 			expect(parameters).toHaveProperty("HelloStateMachineArn");
 			expect(parameters).toHaveProperty("HelloStateMachineName");
 			expect(parameters).toHaveProperty("WorldStateMachineArn");
 			expect(parameters).toHaveProperty("WorldStateMachineName");
 			expect(parameters).toHaveProperty("TopicArn");
 		};
-    
-		const checkNestedStackParameterValues = (values) => {
+
+		const checkNestedStackParameterValues = values => {
 			expect(Object.keys(values)).toHaveLength(5);
-      
+
 			expect(values).toHaveProperty("HelloStateMachineArn");
 			expect(values.HelloStateMachineArn).toEqual({
 				Ref: "HelloStateMachine"
@@ -84,31 +84,31 @@ describe("#stepfunctions", () => {
 			expect(values.WorldStateMachineArn).toEqual({
 				Ref: "WorldStateMachine"
 			});
-      
+
 			expect(values).toHaveProperty("WorldStateMachineName");
 			expect(values.WorldStateMachineName).toEqual({
 				"Fn::GetAtt": ["WorldStateMachine", "Name"]
 			});
-      
+
 			expect(values).toHaveProperty("TopicArn");
 			expect(values.TopicArn).toEqual({
 				Ref: "MacroParamTopicArn"
 			});
 		};
-    
+
 		test("when there is no override config, it generates three alarms for each state machine", async () => {
 			const nestedStack = await sfn.createAlarms(fragment, defaultConfig);
 			expect(nestedStack).not.toBeNull();
 			expect(mockPutObject).toBeCalled();
 			expect(mockGetSignedUrl).toBeCalled();
-      
+
 			const [{ Body, Bucket }] = mockPutObject.mock.calls[0];
 			expect(Bucket).toBe(process.env.BUCKET);
 			const { Resources, Parameters } = JSON.parse(Body);
-      
+
 			checkNestedStackParameters(Parameters);
 			checkNestedStackParameterValues(nestedStack.Properties.Parameters);
-      
+
 			const logicalIds = Object.keys(Resources);
 			expect(logicalIds).toHaveLength(6);
 			const expectedLogicalIds = [
@@ -120,7 +120,7 @@ describe("#stepfunctions", () => {
 				"WorldStateMachineTimeOutCountAlarm"
 			];
 			expect(logicalIds).toEqual(expect.arrayContaining(expectedLogicalIds));
-  
+
 			Object.values(Resources).forEach(resource => {
 				expect(resource.Type).toBe("AWS::CloudWatch::Alarm");
 				expect(resource).toHaveProperty("Properties.AlarmName");
@@ -131,7 +131,7 @@ describe("#stepfunctions", () => {
 				expect(resource).toHaveProperty("Properties.Statistic", "Sum");
 			});
 		});
-    
+
 		test("when the override config disables an alarm, no alarm is generated", async () => {
 			const overrideConfig = {
 				stepFunctions: [
@@ -149,26 +149,23 @@ describe("#stepfunctions", () => {
 					}
 				]
 			};
-  
+
 			const nestedStack = await sfn.createAlarms(fragment, defaultConfig, overrideConfig);
 			expect(nestedStack).not.toBeNull();
 			expect(mockPutObject).toBeCalled();
 			expect(mockGetSignedUrl).toBeCalled();
-      
+
 			const [{ Body, Bucket }] = mockPutObject.mock.calls[0];
 			expect(Bucket).toBe(process.env.BUCKET);
 			const { Resources, Parameters } = JSON.parse(Body);
-      
+
 			checkNestedStackParameters(Parameters);
 			checkNestedStackParameterValues(nestedStack.Properties.Parameters);
-      
+
 			const logicalIds = Object.keys(Resources);
 			expect(logicalIds).toHaveLength(2);
-			const expectedLogicalIds = [
-				"HelloStateMachineFailedCountAlarm",
-				"WorldStateMachineThrottleCountAlarm"
-			];
-			expect(logicalIds).toEqual(expect.arrayContaining(expectedLogicalIds));			
+			const expectedLogicalIds = ["HelloStateMachineFailedCountAlarm", "WorldStateMachineThrottleCountAlarm"];
+			expect(logicalIds).toEqual(expect.arrayContaining(expectedLogicalIds));
 		});
 	});
 });

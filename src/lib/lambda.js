@@ -4,7 +4,7 @@ const _ = require("lodash");
 const { BaseTarget } = require("./baseTarget");
 
 class Lambda extends BaseTarget {
-	constructor () {
+	constructor() {
 		super("AWS::Lambda::Function");
 	}
 
@@ -13,31 +13,31 @@ class Lambda extends BaseTarget {
 		const override = _.get(overrideConfig, "lambdaFunctions", []).find(
 			x => x.logicalId === logicalId || x.functionName === resource.Properties.FunctionName
 		);
-  
+
 		return _.merge(config, override || {});
 	}
-  
+
 	createAlarmsFor(logicalId, resource, config) {
 		const alarms = {};
 		const stackParams = {};
 		const stackParamValues = {};
-    
+
 		// for each function, we will need to define a param for the nested stack
 		const functionNameParam = `${logicalId}Name`;
-    
+
 		stackParams[functionNameParam] = {
 			Type: "String",
 			Description: `Name of the Lambda function identified as ${logicalId} in the parent stack`
 		};
-    
+
 		// its value need to be provided by the parent stack
 		stackParamValues[functionNameParam] = {
 			Ref: logicalId
 		};
-    
+
 		// the alarm would need to reference them
 		const name = { Ref: functionNameParam };
-    
+
 		if (_.get(config, "errorRate.enabled", false)) {
 			log.debug("generating lambda error rate alarm...", { logicalId });
 			alarms[`${logicalId}ErrorRateAlarm`] = generateErrorRateAlarm(name, config.errorRate);
@@ -58,7 +58,7 @@ class Lambda extends BaseTarget {
 			log.debug("generating lambda iterator age alarms...", { logicalId });
 			alarms[`${logicalId}IteratorAgeAlarm`] = generateIteratorAgeAlarm(name, config.iteratorAge);
 		}
-    
+
 		return { alarms, stackParams, stackParamValues };
 	}
 }
@@ -171,7 +171,7 @@ function generateDlqErrorCountAlarm(functionName, { threshold, evaluationPeriods
 			}
 		]
 	};
-  
+
 	return {
 		Type: "AWS::CloudWatch::Alarm",
 		Properties: {

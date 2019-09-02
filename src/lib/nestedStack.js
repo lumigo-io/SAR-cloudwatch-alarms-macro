@@ -12,28 +12,26 @@ async function createNestedStack(resources, parameters, parameterValues) {
 		Resources: resources,
 		Parameters: parameters
 	};
-  
+
 	const body = JSON.stringify(nestedStack, undefined, 2);
-  
+
 	const s3Key = uuid();
-	log.debug(
-		"generating nested stack...", 
-		{ 
-			resourceCount: resources.length,
-			parameters,
-			key: s3Key,
-			bucket: BUCKET,
-			body
-		});
-  
+	log.debug("generating nested stack...", {
+		resourceCount: resources.length,
+		parameters,
+		key: s3Key,
+		bucket: BUCKET,
+		body
+	});
+
 	await S3.putObject({ Bucket: BUCKET, Key: s3Key, Body: body }).promise();
 	const url = S3.getSignedUrl("getObject", {
 		Bucket: BUCKET,
 		Key: s3Key
 	});
-  
+
 	log.debug("generating nested stack...SUCCESS!", { url, parameterValues });
-  
+
 	// resource for the parent stack
 	const resource = {
 		Type: "AWS::CloudFormation::Stack",
@@ -42,7 +40,7 @@ async function createNestedStack(resources, parameters, parameterValues) {
 			Parameters: parameterValues
 		}
 	};
-  
+
 	return resource;
 }
 
