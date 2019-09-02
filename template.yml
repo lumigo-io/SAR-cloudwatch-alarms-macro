@@ -6,7 +6,7 @@ Metadata:
     Name: cloudwatch-alarms-macro
     Description: Creates a macro that can auto-generate CloudWatch Alarms for API Gateway, Lambda, SQS and Step Functions.
     Author: Lumigo
-    SpdxLicenseId: Apache 2.0
+    SpdxLicenseId: Apache-2.0
     LicenseUrl: LICENSE
     ReadmeUrl: README.md
     Labels: ['lambda', 'cloudwatch', 'alarms', 'monitoring']
