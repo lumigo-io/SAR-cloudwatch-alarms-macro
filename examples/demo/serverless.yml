@@ -1,5 +1,8 @@
 service: sar-cloudwatch-alarms-macro-demo
 
+plugins:
+  - serverless-step-functions
+
 provider:
   name: aws
   runtime: nodejs10.x
@@ -30,6 +33,7 @@ resources:
   Transform:
     # assuming this is the name you gave the macro when you deployed the SAR app
     - AddCloudWatchAlarms
+
   Parameters:
     MacroParamStage:
       Type: String
@@ -40,6 +44,7 @@ resources:
     MacroParamOverrideConfigParamName:
       Type: String
       Default: /alarms/overrideConfig
+
   # should generate alarm for the queue
   Resources:
     MyQueue:

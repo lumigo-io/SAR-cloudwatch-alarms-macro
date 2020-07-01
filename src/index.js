@@ -74,7 +74,7 @@ async function getDefaultConfig() {
 }
 
 async function getOverrideConfig(fragment) {
-	const paramName = _.get(fragment, `Parameter.${OverrideConfigParamName}`);
+	const paramName = _.get(fragment, `Parameters.${OverrideConfigParamName}`);
 	if (!paramName) {
 		log.debug("no override config parameter is configured, skipped loading override config...");
 		return {};
