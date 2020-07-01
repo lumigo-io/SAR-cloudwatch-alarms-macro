@@ -74,14 +74,14 @@ async function getDefaultConfig() {
 }
 
 async function getOverrideConfig(fragment) {
-	const paramName = _.get(fragment, `Parameters.${OverrideConfigParamName}`);
-	if (!paramName) {
+	const param = _.get(fragment, `Parameters.${OverrideConfigParamName}`);
+	if (!param) {
 		log.debug("no override config parameter is configured, skipped loading override config...");
 		return {};
 	}
 
-	log.debug("loading override config...", { paramName });
-	return await loadAndValidateConfig(paramName, overrideConfigSchema);
+	log.debug("loading override config...", { param });
+	return await loadAndValidateConfig(param.Default, overrideConfigSchema);
 }
 
 async function loadAndValidateConfig(paramName, schema) {

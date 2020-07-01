@@ -11,7 +11,7 @@ Metadata:
     ReadmeUrl: README.md
     Labels: ['lambda', 'cloudwatch', 'alarms', 'monitoring']
     HomePageUrl: https://github.com/lumigo/SAR-cloudwatch-alarms-macro
-    SemanticVersion: 1.0.2
+    SemanticVersion: 1.0.3
     SourceCodeUrl: https://github.com/lumigo/SAR-cloudwatch-alarms-macro
 
 Parameters:
