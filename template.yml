@@ -32,7 +32,7 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       Handler: src/index.handler
-      Runtime: nodejs8.10
+      Runtime: nodejs12.x
       Timeout: 6
       Environment:
         Variables:
