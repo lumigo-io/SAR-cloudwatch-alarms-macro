@@ -17,7 +17,7 @@
   "dependencies": {
     "@dazn/lambda-powertools-logger": "^1.8.2",
     "@hapi/joi": "^15.1.0",
-    "aws-sdk": "^2.501.0",
+    "aws-sdk": "^2.814.0",
     "lodash": "^4.17.19",
     "uuid": "^3.3.2"
   },
