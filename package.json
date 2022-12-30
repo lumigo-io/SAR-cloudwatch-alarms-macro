@@ -36,7 +36,7 @@
     "jest": "^24.8.0",
     "lint-staged": "^9.1.0",
     "prettier": "^1.18.2",
-    "serverless": "^1.49.0",
+    "serverless": "^1.83.3",
     "serverless-cloudformation-sub-variables": "^0.2.1",
     "serverless-cloudside-plugin": "^1.0.3"
   },
